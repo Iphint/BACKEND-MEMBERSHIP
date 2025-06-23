@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    container_name: membership_postgres
+    environment:
+      POSTGRES_USER: kakoba
+      POSTGRES_PASSWORD: kakoba123
+      POSTGRES_DB: membership
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    restart: always
+    container_name: membership_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

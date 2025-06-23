@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  username        String   @unique
+  password        String?
+  no_telp         String?
+  roles           Role[]   @default([USER])
+  profile_picture String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transactions Transaction[]
+  RewardTier   Reward[]
+  Point        Point[]
+}
+
+model Transaction {
+  id                           Int    @id @default(autoincrement())
+  user                         User   @relation(fields: [user_id], references: [id])
+  user_id                      Int
+  name_product_transaction     String
+  price_product_transaction    Int
+  quantity_product_transaction Int
+  point_transaction            Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Point {
+  id            Int  @id @default(autoincrement())
+  user          User @relation(fields: [user_id], references: [id])
+  user_id       Int
+  point_balance Int  @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Reward {
+  id                Int    @id @default(autoincrement())
+  user              User   @relation(fields: [user_id], references: [id])
+  user_id           Int
+  point_transaction Int
+  reward_name       String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RewardTier {
+  id           Int     @id @default(autoincrement())
+  reward_name  String
+  point_needed Int
+  description  String?
+  image_url    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductPromo {
+  id                  Int     @id @default(autoincrement())
+  product_name        String
+  price_normal        Int
+  discount            Int
+  product_description String?
+  product_category    String
+  start_date          DateTime
+  end_date            DateTime
+  stock               Int     @default(0)
+  is_available        Boolean @default(true)
+
+  ImagePromo ImagePromo[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ImagePromo {
+  id         Int          @id @default(autoincrement())
+  product    ProductPromo @relation(fields: [product_id], references: [id])
+  product_id Int
+  image_url  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
